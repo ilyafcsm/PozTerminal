@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "131034146456",
+    "firebase_url": "https://poz-test.firebaseio.com",
+    "project_id": "poz-test",
+    "storage_bucket": "poz-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131034146456:android:e1010a7f7a4d1902c552ed",
+        "android_client_info": {
+          "package_name": "com.example.pozterminal2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC9bbp732ILb_WyswzF01DMS3XXnKxS5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131034146456:android:beb7f290e8d68c68c552ed",
+        "android_client_info": {
+          "package_name": "com.example.pozterminal3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC9bbp732ILb_WyswzF01DMS3XXnKxS5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131034146456:android:1ef8c1e88bac51d6c552ed",
+        "android_client_info": {
+          "package_name": "com.example.poztest2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC9bbp732ILb_WyswzF01DMS3XXnKxS5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "131034146456-qlscj7776sj0k5t25jd025dvfdo8al64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

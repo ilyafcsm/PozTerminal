@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.pozterminal3">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="ru.evotor.permission.receipt.printExtra.SET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:name="MyApp"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <service
+            android:name="com.example.pozterminal3.MyPrintableService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="evo.v2.receipt.sell.printExtra.REQUIRED" />
+            </intent-filter>
+        </service>
+
+        <activity android:name="com.example.pozterminal3.Order" />
+        <activity android:name="com.example.pozterminal3.MyOrders" />
+        <activity
+            android:name="com.example.pozterminal3.DialogActivity"/>
+        <activity android:name="com.example.pozterminal3.DialogActivityOrder" />
+
+        <activity android:name="com.example.pozterminal3.MainActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="app_uuid"
+            android:value="90e11967-d2cc-4632-9d3e-bda3616789f1" />
+    </application>
+
+</manifest>
