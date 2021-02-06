@@ -10,7 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentReference
@@ -83,15 +85,17 @@ class Order : AppCompatActivity() {
             val x = orderRef //db.collection("test").document(orderId)
             val m = db.collection("menu5").document(it.id.toString())
 
+            if (it.amount!!.toInt() > 0) {
             m.update("amount", FieldValue.increment(-1))
             x.update(
                 "items.${currGeust}.${it.id}.amount",
-                1,
+                    FieldValue.increment(+1),
                 "items.${currGeust}.${it.id}.name",
                 it.name
             )
             orderRecview.adapter?.notifyDataSetChanged()
-            menuRecview.adapter?.notifyDataSetChanged()
+            menuRecview.adapter?.notifyDataSetChanged() }
+
 
 //            db.runTransaction{transaction ->
 //                val msnap = transaction.get(m)
@@ -210,7 +214,91 @@ class Order : AppCompatActivity() {
         }
         drawerLayout.addDrawerListener(drawerToggle)
 
-        //Log.d(TAG,"6")
+        //Log.d(TAG,"6")\
+
+
+        val simpleItemTouchCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.DOWN or ItemTouchHelper.UP) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+                //Remove swiped item from list and notify the RecyclerView
+                var position = viewHolder.adapterPosition
+                //Show.longToast(""+position)
+
+                val x = orderRef
+
+                when ((orderRecview.adapter as OrderAdapter).items[position]) {
+                    is RecyclerItem.OrderItem -> {
+                        var newPos = 0
+                        loop@ for( i in position downTo 0 step 1)
+                            when ((orderRecview.adapter as OrderAdapter).items[i]) {
+                              is RecyclerItem.OrderGuest -> {
+                                  break@loop
+                              }
+                              is RecyclerItem.OrderItem -> {
+                                  newPos = i
+                              }
+                            }
+
+
+
+                        var needGuest =  ((orderRecview.adapter as OrderAdapter).items[newPos-1] as RecyclerItem.OrderGuest).name
+                        var needPos = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).kod
+
+                        ////////////////////////////
+                        val updates = hashMapOf<String, Any>(
+                                "items.${needGuest}.${needPos}" to FieldValue.delete()
+                        )
+
+                        x.update(updates).addOnCompleteListener {
+                            (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
+                        }
+
+                    }
+
+                    is RecyclerItem.OrderGuest -> {
+
+
+                        var needPos = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderGuest).name
+
+                        ////////////////////////////
+                        val updates = hashMapOf<String, Any>(
+                                "items.${needPos}" to FieldValue.delete()
+                        )
+
+                        x.update(updates).addOnCompleteListener {
+                            (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
+                        }
+                    }
+                }
+
+
+                ////////////////////////////////////
+
+
+//                db.runTransaction{ transaction ->
+//                    val snapshot = transaction.get(x)
+//                    val n = (snapshot.get("items") as Map<String, Any>).size
+//                    transaction.update(x, "items.${n?.rem(position)}", mapOf<String, String>())
+//                    (orderRecview.adapter as OrderAdapter).items.removeAt(position)
+//                    (orderRecview.adapter as OrderAdapter).notifyItemRemoved(position)
+//                    (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
+//                    transaction
+//                }.addOnSuccessListener { result ->
+//                    val p = (orderRecview.adapter as OrderAdapter).items.size
+//                    Show.longToast(""+p+"err")
+//
+//
+//                }.addOnFailureListener { e ->
+//                    Log.w(TAG, "Transaction failure.", e)
+//                }
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(orderRecview)
 
     }
 
@@ -228,8 +316,15 @@ class Order : AppCompatActivity() {
         val x = orderRef
         db.runTransaction{ transaction ->
             val snapshot = transaction.get(x)
-            val n = (snapshot.get("items") as Map<String, Any>).size
-            transaction.update(x, "items.${n?.plus(1)}", mapOf<String, String>())
+            val n = (snapshot.get("items") as Map<String, Any>).keys
+            var max = 0
+            var thatkey: String
+            n.forEach {
+               var needInt = it.toInt()
+               if (needInt > max)
+                   max = needInt
+            }
+            transaction.update(x, "items.${max?.plus(1)}", mapOf<String, String>())
             transaction
         }.addOnSuccessListener { result ->
             val p = (orderRecview.adapter as OrderAdapter).items.size

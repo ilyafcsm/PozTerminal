@@ -3,12 +3,11 @@ package com.example.pozterminal3
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.type.DateTime
-import java.sql.Date
-import java.sql.Time
 
 
 data class OrderItemData(
@@ -30,6 +29,10 @@ sealed class RecyclerItem{
 }
 
 class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+
+
+
     private val TYPE_GUEST = 0
     private val TYPE_ITEM = 1
 
@@ -125,5 +128,7 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
             }
         }
     }
+
+
 
 }
