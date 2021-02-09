@@ -133,6 +133,22 @@ class DialogActivity : ListActivity() {
         )
 
         val list1 = adapter1
+        var sum = 0.0
+
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(x)
+            //val ng = (snapshot.getDouble("guests")!! + 1).toString()
+            val pSum = snapshot.getDouble("sum")!!
+            //Log.d(TAG,"${n}")
+
+            transaction
+            //transaction.update(x,mapOf("items.Гость $ng" to mutableListOf<String>()))
+        }.addOnSuccessListener { result ->
+
+            sum = result.get(x).get("sum") as Double
+        }.addOnFailureListener { e ->
+        }
 
         builder1.setTitle("Выберите стол")
             .setAdapter(
@@ -144,14 +160,15 @@ class DialogActivity : ListActivity() {
                     "number" to number,
                     "table" to doneNames[item].toString(),
                     "opentime" to time,
-                    "items" to hashMapOf("1" to hashMapOf<String, OrderItemData>())
+                    "items" to hashMapOf("1" to hashMapOf<String, OrderItemData>()),
+                    "sum" to sum
                 )
                 //var StrId: String = "44444444"
 
                 val docRef = db.collection("test")
                     .document()
                 docRef.set(data)
-                    .addOnSuccessListener { Show.longToast("Success") }
+                    .addOnSuccessListener { }
                     .addOnFailureListener { Show.longToast("NoSuccess") }
                 var strId = docRef.id.toString()
 

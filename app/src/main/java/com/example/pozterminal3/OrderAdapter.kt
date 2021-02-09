@@ -12,7 +12,10 @@ import com.google.firebase.ktx.Firebase
 
 data class OrderItemData(
     val name: String? = null,
-    val amount: Double? = null
+    val amount: Double? = null,
+    val addtime: com.google.firebase.Timestamp? = null,
+    val price: Double? = null,
+    val sum: Double? = null
 )
 
 data class OrderData(
@@ -20,12 +23,13 @@ data class OrderData(
     val status: String? = null,
     val table: String? = null,
     val opentime: com.google.firebase.Timestamp? = null,
-    val items: Map<String,Map<String, OrderItemData>>? = null
+    val items: Map<String,Map<String, OrderItemData>>? = null,
+    val sum: Double? = null
 )
 
 sealed class RecyclerItem{
-    data class OrderItem(val name:String, val kod:String, val amount:Double): RecyclerItem()
-    data class OrderGuest(val name: String): RecyclerItem()
+    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double): RecyclerItem()
+    data class OrderGuest(var name: String, var sum: String): RecyclerItem()
 }
 
 class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -111,13 +115,16 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(val item = items[holder.adapterPosition]){
             is RecyclerItem.OrderItem -> {
-                (holder as OrderHolder).itemText.text = (item as RecyclerItem.OrderItem).name + " (${(item as RecyclerItem.OrderItem).amount.toString()})"
+
+                (holder as OrderHolder).itemText.text = (item as RecyclerItem.OrderItem).name + " (${(item as RecyclerItem.OrderItem).amount.toInt().toString()}, ${(item as RecyclerItem.OrderItem).price.toInt().toString()}, ${(item as RecyclerItem.OrderItem).sum.toInt().toString()})"
             }
             is RecyclerItem.OrderGuest -> {
+
                 val cg = (item as RecyclerItem.OrderGuest).name
-                (holder as GuestHolder).guestText.text = (item as RecyclerItem.OrderGuest).name
+                (holder as GuestHolder).guestText.text = (item as RecyclerItem.OrderGuest).name + (item as RecyclerItem.OrderGuest).sum
                 (holder as GuestHolder).itemView.setOnClickListener{ currGuest = cg
                     clickListener(currGuest)
+
                     this.notifyDataSetChanged()
                    // this.notifyItemRangeChanged(position, holder.)
                 }

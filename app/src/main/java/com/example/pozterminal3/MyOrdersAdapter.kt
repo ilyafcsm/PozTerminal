@@ -31,7 +31,7 @@ class MyOrdersAdapter( private val clickListener: (String) -> Unit): RecyclerVie
 
             if (snapshot != null) {
                 myOrders = snapshot.documents!!.map{mapOf("orderId" to it.id, "number" to it.get("number").toString(), "table" to it.get("table").toString(), "opentime" to getDateTime(
-                    it.getTimestamp("opentime")?.toDate()?.time.toString()).toString())} as MutableList<Map<String,String>> //.data?.get("items") as MutableList<String>
+                    it.getTimestamp("opentime")?.toDate()?.time.toString()), "sum" to it.get("sum").toString())} as MutableList<Map<String,String>> //.data?.get("items") as MutableList<String>
                 //Show.longToast("Second ${snapshot.documents.size} ")
                 this.notifyDataSetChanged()
             } else {0

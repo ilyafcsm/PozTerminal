@@ -10,11 +10,11 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -30,6 +30,7 @@ import ru.evotor.framework.core.action.event.receipt.changes.position.PositionAd
 import ru.evotor.framework.core.action.event.receipt.changes.position.SetExtra
 import ru.evotor.framework.receipt.ExtraKey
 import ru.evotor.framework.receipt.Position
+import java.lang.reflect.Field
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -85,36 +86,55 @@ class Order : AppCompatActivity() {
             val x = orderRef //db.collection("test").document(orderId)
             val m = db.collection("menu5").document(it.id.toString())
 
-            if (it.amount!!.toInt() > 0) {
-            m.update("amount", FieldValue.increment(-1))
-            x.update(
-                "items.${currGeust}.${it.id}.amount",
-                    FieldValue.increment(+1),
-                "items.${currGeust}.${it.id}.name",
-                it.name
-            )
-            orderRecview.adapter?.notifyDataSetChanged()
-            menuRecview.adapter?.notifyDataSetChanged() }
-
-
-//            db.runTransaction{transaction ->
-//                val msnap = transaction.get(m)
-//                val xsmap = transaction.get(x)
+//            if (x.get()?.result?.get("items.${currGeust}.${it.id}") == null)
 //
-//                //val ng = (snapshot.getDouble("guests")!! + 1).toString()
-//                transaction.update(m,"amount",FieldValue.increment(-1))
-//                transaction.update(x,"items.${currGeust}.${it.id}.amount",1,"items.${currGeust}.${it.id}.name",it.name)
-//                //transaction.update(x,"items.${currGeust}.${it.id}.name",it.name)
-//
-//                transaction
-//            }.addOnSuccessListener { result ->
-//                Log.d(TAG, "Transaction success")
+//            if (it.amount!!.toInt() > 0) {
+//                m.update("amount", FieldValue.increment(-1))
+//                x.update(
+//                    "items.${currGeust}.${it.id}.amount",
+//                        FieldValue.increment(+1),
+//                    "items.${currGeust}.${it.id}.name",
+//                    it.name
+//                )
 //                orderRecview.adapter?.notifyDataSetChanged()
-//                menuRecview.adapter?.notifyDataSetChanged()
-//            }.addOnFailureListener { e ->
-//                Log.w(TAG, "Transaction failure.", e)
-//            }
-            //orderRecview.adapter?.notifyDataSetChanged()
+//                menuRecview.adapter?.notifyDataSetChanged() }
+
+            db.runTransaction{transaction ->
+                val msnap = transaction.get(m)
+                val xsmap = transaction.get(x)
+
+                //val ng = (snapshot.getDouble("guests")!! + 1).toString()
+                if (it.amount!!.toInt() > 0) {
+
+                    var counterValue: Int?
+                    if (xsmap?.get("items.${currGeust}.${it.id}.amount") == null)
+                        counterValue = 0
+                    else
+                        counterValue = xsmap?.get("items.${currGeust}.${it.id}.amount").toString().toInt()
+
+                    transaction.update(m,"amount",FieldValue.increment(-1))
+                    transaction.update(x,"items.${currGeust}.${it.id}.amount",FieldValue.increment(+1),
+                            "items.${currGeust}.${it.id}.name",it.name,
+                        "items.${currGeust}.${it.id}.price",it.price,
+                        "items.${currGeust}.${it.id}.sum", it.price?.times(counterValue +1))
+
+                    if (xsmap?.get("items.${currGeust}.${it.id}") == null) {
+                        transaction.update(x,"items.${currGeust}.${it.id}.addtime", com.google.firebase.Timestamp.now())
+                    }
+
+                    transaction.update(x, "sum", FieldValue.increment(it.price!!))
+
+                    orderRecview.adapter
+
+                    transaction
+            }}.addOnSuccessListener { result ->
+                Log.d(TAG, "Transaction success")
+                orderRecview.adapter?.notifyDataSetChanged()
+                menuRecview.adapter?.notifyDataSetChanged()
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Transaction failure.", e)
+            }
+            orderRecview.adapter?.notifyDataSetChanged()
 
         }
 
@@ -138,12 +158,14 @@ class Order : AppCompatActivity() {
                 //items = snapshot.data?.get("items") as MutableList<String> //.data?.get("items") as MutableList<String>
                 (orderRecview.adapter as OrderAdapter).items  =
                     ((snapshot.toObject<OrderData>()?.items?.toSortedMap()?.flatMap { (guest, itm) -> mutableListOf<RecyclerItem>(
-                        RecyclerItem.OrderGuest(guest)
-                    ) + ((itm.entries.map { (kod, itm2) ->
+                        RecyclerItem.OrderGuest(guest, " (${itm.toList().fold(0.0, { a, (c, b) -> a + b.sum!!})})")
+                    ) + ((itm.toList().sortedBy { (a,b) -> b.addtime }.map { (kod, itm2) ->
                         RecyclerItem.OrderItem(
                             itm2.name!!,
                             kod,
-                            itm2.amount!!
+                            itm2.amount!!,
+                            itm2.price!!,
+                            itm2.sum!!
                         )
                     } as MutableList<RecyclerItem>?)!!)}) as MutableList<RecyclerItem>?)!! //map{RecyclerItem.OrderItem(it)}}) as MutableList<RecyclerItem>
                 (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
@@ -153,7 +175,7 @@ class Order : AppCompatActivity() {
                 //timeField = snapshot.getTimestamp("time")
                 var time1 = snapshot.getTimestamp("opentime")!!.toDate().time.toString()
                 var ptime = getDateTime(time1)
-                supportActionBar?.subtitle = ptime
+                supportActionBar?.subtitle = ptime + ",  ${snapshot.getDouble("sum")}р"
 
             } else {
                 Log.d(TAG, "Current data: null")
@@ -336,7 +358,7 @@ class Order : AppCompatActivity() {
                 }
                 else
                 {}
-            }, 650)
+            }, 680)
 
 
         }.addOnFailureListener { e ->
