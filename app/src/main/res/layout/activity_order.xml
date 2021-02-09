@@ -22,6 +22,7 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -31,7 +32,7 @@
                 android:layout_height="35dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:onClick="addGuest"
                 android:text="GUEST"
                 android:textSize="12sp"
@@ -44,7 +45,7 @@
                 android:layout_height="35dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:onClick="print"
                 android:text="Print"
                 android:textSize="12sp"
@@ -57,7 +58,7 @@
                 android:layout_height="35dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:onClick="choosetable"
                 app:layout_constraintEnd_toEndOf="@+id/toolbar"
                 app:layout_constraintTop_toTopOf="parent" />

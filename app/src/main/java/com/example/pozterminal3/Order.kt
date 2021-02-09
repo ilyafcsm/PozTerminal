@@ -268,10 +268,12 @@ class Order : AppCompatActivity() {
 
                         var needGuest =  ((orderRecview.adapter as OrderAdapter).items[newPos-1] as RecyclerItem.OrderGuest).name
                         var needPos = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).kod
+                        var needSum = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).sum
 
                         ////////////////////////////
                         val updates = hashMapOf<String, Any>(
-                                "items.${needGuest}.${needPos}" to FieldValue.delete()
+                                "items.${needGuest}.${needPos}" to FieldValue.delete(),
+                                "sum" to FieldValue.increment(- needSum)
                         )
 
                         x.update(updates).addOnCompleteListener {
@@ -284,10 +286,13 @@ class Order : AppCompatActivity() {
 
 
                         var needPos = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderGuest).name
+                        var needSum = ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).sum
+
 
                         ////////////////////////////
                         val updates = hashMapOf<String, Any>(
-                                "items.${needPos}" to FieldValue.delete()
+                                "items.${needPos}" to FieldValue.delete(),
+                            "sum" to FieldValue.increment(- needSum)
                         )
 
                         x.update(updates).addOnCompleteListener {
