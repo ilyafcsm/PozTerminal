@@ -15,7 +15,8 @@ data class OrderItemData(
     val amount: Double? = null,
     val addtime: com.google.firebase.Timestamp? = null,
     val price: Double? = null,
-    val sum: Double? = null
+    val sum: Double? = null,
+    val comm: String? = null
 )
 
 data class OrderData(
@@ -28,7 +29,7 @@ data class OrderData(
 )
 
 sealed class RecyclerItem{
-    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double): RecyclerItem()
+    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String): RecyclerItem()
     data class OrderGuest(var name: String, var sum: String): RecyclerItem()
 }
 
@@ -117,6 +118,7 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
             is RecyclerItem.OrderItem -> {
 
                 (holder as OrderHolder).itemText.text = (item as RecyclerItem.OrderItem).name + " (${(item as RecyclerItem.OrderItem).amount.toInt().toString()}, ${(item as RecyclerItem.OrderItem).price.toInt().toString()}, ${(item as RecyclerItem.OrderItem).sum.toInt().toString()})"
+                (holder as OrderHolder).textComm.text = (item as RecyclerItem.OrderItem).comm
             }
             is RecyclerItem.OrderGuest -> {
 
