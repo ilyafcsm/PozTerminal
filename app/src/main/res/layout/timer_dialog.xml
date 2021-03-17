@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="450dp">
 
@@ -52,5 +53,24 @@
             android:editable="true"
             android:hint="Комментарий..." />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/spinner12"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/textViewSpinner"
+        android:dropDownWidth="match_parent"
+        android:focusable="false"
+        android:spinnerMode="dropdown"
+        android:visibility="visible"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/textViewSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/numberPicker1"
+        android:layout_centerHorizontal="true"
+        android:text="TextView" />
 
 </RelativeLayout>

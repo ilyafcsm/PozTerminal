@@ -10,7 +10,8 @@ data class MenuItem(
     val id: String?,
     val name: String?,
     val amount: Double?,
-    val price: Double?
+    val price: Double?,
+    val modifor: HashMap<Any, String>?
 )
 
 

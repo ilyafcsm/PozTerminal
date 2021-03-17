@@ -1,8 +1,6 @@
 package com.example.pozterminal3
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -22,7 +20,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_order.*
-import kotlinx.android.synthetic.main.activity_order.view.*
 import kotlinx.android.synthetic.main.menu_holder.view.*
 import kotlinx.android.synthetic.main.order_holder.view.*
 import org.json.JSONException
@@ -37,6 +34,7 @@ import ru.evotor.framework.receipt.Position
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class Order : AppCompatActivity() {
     private val TAG = "Order XXXXXXX"
@@ -112,7 +110,8 @@ class Order : AppCompatActivity() {
                     transaction.update(x,"items.${currGeust}.${it.id}.amount",FieldValue.increment(+1),
                             "items.${currGeust}.${it.id}.name",it.name,
                         "items.${currGeust}.${it.id}.price",it.price,
-                        "items.${currGeust}.${it.id}.sum", it.price?.times(counterValue +1))
+                        "items.${currGeust}.${it.id}.sum", it.price?.times(counterValue +1),
+                        "items.${currGeust}.${it?.id}.comm", "")
 
                     if (xsmap?.get("items.${currGeust}.${it.id}") == null) {
                         transaction.update(x,"items.${currGeust}.${it.id}.addtime", com.google.firebase.Timestamp.now())
@@ -213,7 +212,8 @@ class Order : AppCompatActivity() {
                         it.id,
                         it.getString("name"),
                         it.getDouble("amount"),
-                        it.getDouble("price")
+                        it.getDouble("price"),
+                        it.get("modifor") as HashMap<Any, String>?
                     )
                 } as MutableList<MenuItem>
 
@@ -222,7 +222,8 @@ class Order : AppCompatActivity() {
                         it.id,
                         it.getString("name"),
                         it.getDouble("amount"),
-                        it.getDouble("price")
+                        it.getDouble("price"),
+                        it.get("modifor") as HashMap<Any, String>?
                     )
                 } as MutableList<MenuItem>
                 //myOrders = snapshot.documents!!.map{mapOf("orderId" to it.id, "number" to it.get("number").toString())} as MutableList<Map<String,String>> //.data?.get("items") as MutableList<String>
@@ -392,11 +393,22 @@ class Order : AppCompatActivity() {
         d.setContentView(R.layout.timer_dialog)
         val b1 = d.findViewById(R.id.button1) as Button
         val b2 = d.findViewById(R.id.button2) as Button
+        val spin = d.findViewById(R.id.spinner12) as Spinner
         val t2 = d.findViewById(R.id.textView2) as TextView
+        val tspin = d.findViewById(R.id.textViewSpinner) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         val dcomm = d.findViewById(R.id.editcomm) as EditText
 
+        val modifors = item.modifor!!.values.toMutableList()
+
+        val adapterSpin: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
+        adapterSpin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterSpin.notifyDataSetChanged()
+        spin.adapter = adapterSpin
+        spin.setSelection(0)
+
         t2.text = needName1
+        tspin.text = "Выберите модификатор:"
         np.maxValue = 20
         np.minValue = 2
         np.wrapSelectorWheel = false
@@ -404,6 +416,8 @@ class Order : AppCompatActivity() {
             var settingValue = np.value
             val x1 = orderRef //db.collection("test").document(orderId)
             val m1 = db.collection("menu5").document(item?.id.toString())
+            val textts = mutableListOf<String>("11", "12", "13", "14", "15", "16")
+            //Show.longToast(""+ modifors.size)
 
             db.runTransaction{transaction1 ->
                 val msnap1 = transaction1.get(m1)
@@ -422,8 +436,14 @@ class Order : AppCompatActivity() {
                     transaction1.update(x1,"items.${currGeust}.${item?.id}.amount",FieldValue.increment(settingValue.toDouble()),
                         "items.${currGeust}.${item?.id}.name",item?.name,
                         "items.${currGeust}.${item?.id}.price",item?.price,
-                        "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue),
-                        "items.${currGeust}.${item?.id}.comm", dcomm.text.toString())
+                        "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
+
+                    if (dcomm.text.toString() !== "") {
+                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", dcomm.text.toString() + " + " + spin.selectedItem.toString())
+                    }
+                    else{
+                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", spin.selectedItem.toString())
+                    }
 
                     if (xsmap1?.get("items.${currGeust}.${item?.id}") == null) {
                         transaction1.update(x1,"items.${currGeust}.${item?.id}.addtime", com.google.firebase.Timestamp.now())
@@ -468,11 +488,22 @@ class Order : AppCompatActivity() {
         d.setContentView(R.layout.timer_dialog)
         val b1 = d.findViewById(R.id.button1) as Button
         val b2 = d.findViewById(R.id.button2) as Button
+        val spin = d.findViewById(R.id.spinner12) as Spinner
         val t2 = d.findViewById(R.id.textView2) as TextView
+        val tspin = d.findViewById(R.id.textViewSpinner) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         val comm = d.findViewById(R.id.editcomm) as EditText
 
+        val modifors = item.modifor!!.values.toMutableList()
+
+        val adapterSpin: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
+        adapterSpin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterSpin.notifyDataSetChanged()
+        spin.adapter = adapterSpin
+        spin.setSelection(0)
+
         t2.text = needName2
+        tspin.text = "Выберите модификатор:"
         np.maxValue = 25
         np.minValue = 1
         np.wrapSelectorWheel = false
@@ -498,8 +529,14 @@ class Order : AppCompatActivity() {
                     transaction1.update(x1,"items.${currGeust}.${item?.id}.amount",FieldValue.increment(settingValue.toDouble()),
                         "items.${currGeust}.${item?.id}.name",item?.name,
                         "items.${currGeust}.${item?.id}.price",item?.price,
-                        "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue),
-                        "items.${currGeust}.${item?.id}.comm", comm.text.toString())
+                        "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
+
+                    if (comm.text.toString() !== "") {
+                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", comm.text.toString() + " + " + spin.selectedItem.toString())
+                    }
+                    else{
+                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", spin.selectedItem.toString())
+                    }
 
                     if (xsmap1?.get("items.${currGeust}.${item?.id}") == null) {
                         transaction1.update(x1,"items.${currGeust}.${item?.id}.addtime", com.google.firebase.Timestamp.now())
