@@ -34,7 +34,6 @@ import ru.evotor.framework.receipt.Position
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 class Order : AppCompatActivity() {
     private val TAG = "Order XXXXXXX"
@@ -393,19 +392,39 @@ class Order : AppCompatActivity() {
         d.setContentView(R.layout.timer_dialog)
         val b1 = d.findViewById(R.id.button1) as Button
         val b2 = d.findViewById(R.id.button2) as Button
-        val spin = d.findViewById(R.id.spinner12) as Spinner
+       // val modtext = d.findViewById(R.id.modiforName) as TextView
         val t2 = d.findViewById(R.id.textView2) as TextView
         val tspin = d.findViewById(R.id.textViewSpinner) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         val dcomm = d.findViewById(R.id.editcomm) as EditText
 
-        val modifors = item.modifor!!.values.toMutableList()
+        var needItem: String = ""
 
-        val adapterSpin: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
-        adapterSpin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        adapterSpin.notifyDataSetChanged()
-        spin.adapter = adapterSpin
-        spin.setSelection(0)
+        var modifors = mutableListOf<String>()
+
+        if (item.modifor.isNullOrEmpty()) {
+
+            }
+        else{
+            modifors = item.modifor!!.values.toMutableList()
+            val recMod = d.findViewById(R.id.recMod) as RecyclerView
+            val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            recMod.layoutManager = layoutManager
+            recMod.adapter = ModAdapter(modifors) {
+                needItem = it
+        }
+        }
+        //val adapterRec: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
+
+        //recMod
+
+        //val modifors = item.modifor!!.values.toMutableList()
+
+//        val adapterSpin: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
+//        adapterSpin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//        adapterSpin.notifyDataSetChanged()
+//        spin.adapter = adapterSpin
+//        spin.setSelection(0)
 
         t2.text = needName1
         tspin.text = "Выберите модификатор:"
@@ -439,10 +458,10 @@ class Order : AppCompatActivity() {
                         "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
 
                     if (dcomm.text.toString() !== "") {
-                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", dcomm.text.toString() + " + " + spin.selectedItem.toString())
+                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", dcomm.text.toString() + System.getProperty("line.separator") + needItem)
                     }
                     else{
-                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", spin.selectedItem.toString())
+                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", needItem)
                     }
 
                     if (xsmap1?.get("items.${currGeust}.${item?.id}") == null) {
@@ -488,19 +507,25 @@ class Order : AppCompatActivity() {
         d.setContentView(R.layout.timer_dialog)
         val b1 = d.findViewById(R.id.button1) as Button
         val b2 = d.findViewById(R.id.button2) as Button
-        val spin = d.findViewById(R.id.spinner12) as Spinner
+        //val spin = d.findViewById(R.id.spinner12) as Spinner
         val t2 = d.findViewById(R.id.textView2) as TextView
         val tspin = d.findViewById(R.id.textViewSpinner) as TextView
         val np = d.findViewById(R.id.numberPicker1) as NumberPicker
         val comm = d.findViewById(R.id.editcomm) as EditText
 
-        val modifors = item.modifor!!.values.toMutableList()
+        var needItem: String = ""
 
-        val adapterSpin: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modifors!!)
-        adapterSpin.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        adapterSpin.notifyDataSetChanged()
-        spin.adapter = adapterSpin
-        spin.setSelection(0)
+        var modifors = mutableListOf<String>()
+        modifors = item.modifor!!.values.toMutableList()
+
+        if (modifors !== null) {
+            val recMod = d.findViewById(R.id.recMod) as RecyclerView
+            val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            recMod.layoutManager = layoutManager
+            recMod.adapter = ModAdapter(modifors) {
+                needItem = it
+            }
+        }
 
         t2.text = needName2
         tspin.text = "Выберите модификатор:"
@@ -532,10 +557,10 @@ class Order : AppCompatActivity() {
                         "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
 
                     if (comm.text.toString() !== "") {
-                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", comm.text.toString() + " + " + spin.selectedItem.toString())
+                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", comm.text.toString() + System.getProperty("line.separator") + needItem)
                     }
                     else{
-                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", spin.selectedItem.toString())
+                        transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", needItem)
                     }
 
                     if (xsmap1?.get("items.${currGeust}.${item?.id}") == null) {
