@@ -2,6 +2,7 @@ package com.example.pozterminal3
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -117,13 +118,31 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
         when(val item = items[holder.adapterPosition]){
             is RecyclerItem.OrderItem -> {
 
-                (holder as OrderHolder).itemText.text = (item as RecyclerItem.OrderItem).name + " (${(item as RecyclerItem.OrderItem).amount.toInt().toString()}, ${(item as RecyclerItem.OrderItem).price.toInt().toString()}, ${(item as RecyclerItem.OrderItem).sum.toInt().toString()})"
+                (holder as OrderHolder).itemText.text = (item as RecyclerItem.OrderItem).name
+                (holder as OrderHolder).textSumOrd.text = (item as RecyclerItem.OrderItem).amount.toInt().toString() + " x " + (item as RecyclerItem.OrderItem).price.toInt().toString() +  "р" + " = " + (item as RecyclerItem.OrderItem).sum.toInt().toString() + "р"
                 (holder as OrderHolder).textComm.text = (item as RecyclerItem.OrderItem).comm
+
+                (holder as OrderHolder).itemText.setTextColor(Color.BLACK)
+                (holder as OrderHolder).textSumOrd.setTextColor(Color.BLACK)
+                (holder as OrderHolder).textComm.setTextColor(Color.BLACK)
+
+                if ((holder as OrderHolder).textComm.text.isNullOrEmpty()) {
+                    (holder as OrderHolder).textComm.visibility = View.GONE
+                    (holder as OrderHolder).itemView.layoutParams.height = 145
+                }
+
+
             }
             is RecyclerItem.OrderGuest -> {
 
                 val cg = (item as RecyclerItem.OrderGuest).name
-                (holder as GuestHolder).guestText.text = (item as RecyclerItem.OrderGuest).name + (item as RecyclerItem.OrderGuest).sum
+                var resultSum = (item as RecyclerItem.OrderGuest).sum.toString()
+                var resultSum1 = resultSum.removeSurrounding(
+                    " (", // prefix
+                    ")" // suffix
+                )
+                (holder as GuestHolder).guestText.text = "Гость "+ (item as RecyclerItem.OrderGuest).name
+                (holder as GuestHolder).sumText.text = resultSum1 + "р"
                 (holder as GuestHolder).itemView.setOnClickListener{ currGuest = cg
                     clickListener(currGuest)
 
@@ -131,9 +150,14 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
                    // this.notifyItemRangeChanged(position, holder.)
                 }
                 if (cg == currGuest){
-                    (holder as GuestHolder).itemView.setBackgroundColor(Color.BLUE)
+                    (holder as GuestHolder).itemView.setBackgroundColor(Color.DKGRAY)
+                    (holder as GuestHolder).guestText.setTextColor(Color.WHITE)
+                    (holder as GuestHolder).sumText.setTextColor(Color.WHITE)
                 }else{
-                    (holder as GuestHolder).itemView.setBackgroundColor(Color.YELLOW)}
+                    (holder as GuestHolder).itemView.setBackgroundColor(Color.LTGRAY)
+                    (holder as GuestHolder).guestText.setTextColor(Color.BLACK)
+                    (holder as GuestHolder).sumText.setTextColor(Color.BLACK)
+                }
             }
         }
     }

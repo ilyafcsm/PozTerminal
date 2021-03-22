@@ -13,53 +13,56 @@
         android:layout_height="match_parent"
         android:id="@+id/orderContent">
 
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="#45EBEBEB"
             android:elevation="4dp"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <Button
-                android:id="@+id/toolbarbtn"
-                android:layout_width="63dp"
-                android:layout_height="35dp"
-                android:layout_gravity="right"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:onClick="addGuest"
-                android:text="GUEST"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="@+id/toolbar"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
+            <ImageButton
                 android:id="@+id/print"
-                android:layout_width="63dp"
-                android:layout_height="35dp"
+                android:layout_width="47dp"
+                android:layout_height="47dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:onClick="print"
-                android:text="Print"
-                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/toolbar"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/send_button" />
 
-            <Button
-                android:id="@+id/chosentable"
-                android:layout_width="53dp"
-                android:layout_height="35dp"
+            <ImageButton
+                android:id="@+id/toolbarbtn"
+                android:layout_width="47dp"
+                android:layout_height="47dp"
                 android:layout_gravity="right"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
+                android:onClick="addGuest"
+                app:layout_constraintEnd_toEndOf="@+id/toolbar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/guest_button1" />
+
+            <Button
+                android:id="@+id/chosentable"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center|center_horizontal|top|center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="#00FFFFFF"
+                android:gravity="center_horizontal|center_vertical"
                 android:onClick="choosetable"
+                android:text="1"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="@+id/toolbar"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -70,13 +73,16 @@
             android:layout_width="372dp"
             android:layout_height="568dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="44dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="64dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.652"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintVertical_bias="0.0" >
+
+        </androidx.recyclerview.widget.RecyclerView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

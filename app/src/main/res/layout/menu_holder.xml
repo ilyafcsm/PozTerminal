@@ -24,15 +24,25 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="80dp"
+        android:layout_width="85dp"
         android:layout_height="29dp"
         android:layout_marginStart="200dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="3dp"
         android:text="TextView"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/itemTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="60dp"
+        android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -274,6 +275,9 @@ class Order : AppCompatActivity() {
 
                     //Remove swiped item from list and notify the RecyclerView
                     var position = viewHolder.adapterPosition
+
+                    val updates1 = hashMapOf<String, Any>()
+                    val updates = hashMapOf<String, Any>()
                     //Show.longToast(""+position)
 
                     val x = orderRef
@@ -296,14 +300,30 @@ class Order : AppCompatActivity() {
                                 ((orderRecview.adapter as OrderAdapter).items[newPos - 1] as RecyclerItem.OrderGuest).name
                             var needPos =
                                 ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).kod
+                            var needName =
+                                ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).name.toLowerCase()
                             var needSum =
                                 ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).sum
+                            var needAmount =
+                                ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderItem).amount
+
+                            var itemsNew = itemsNeed?.filter { it.name?.toLowerCase()?.contains(needName!!)!! } as MutableList<MenuItem>
+                            var needFood = itemsNew[0]
+                            val m = db.collection("menu5").document(needFood.id.toString())
 
                             ////////////////////////////
                             val updates = hashMapOf<String, Any>(
                                 "items.${needGuest}.${needPos}" to FieldValue.delete(),
                                 "sum" to FieldValue.increment(-needSum)
                             )
+
+                            val updates1 = hashMapOf<String, Any>(
+                                "amount" to FieldValue.increment(+ needAmount)
+                            )
+
+                            m.update(updates1).addOnCompleteListener{
+                                (menuRecview.adapter as MenuAdapter).notifyDataSetChanged()
+                            }
 
                             x.update(updates).addOnCompleteListener {
                                 (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
@@ -313,54 +333,59 @@ class Order : AppCompatActivity() {
 
                         is RecyclerItem.OrderGuest -> {
 
-                            val numbersForFun: MutableList<Int> = mutableListOf(1, 2, 3)
+                            val con = (orderRecview.adapter as OrderAdapter).items.size
+
+                            loop@ for (sh in position..con-1) {
+                                when ((orderRecview.adapter as OrderAdapter).items[sh]) {
+                                    is RecyclerItem.OrderGuest -> {
+                                        if (sh == position) {
+
+                                            var needPos =
+                                                ((orderRecview.adapter as OrderAdapter).items[sh] as RecyclerItem.OrderGuest).name
+                                            var needSum =
+                                                ((orderRecview.adapter as OrderAdapter).items[sh] as RecyclerItem.OrderGuest).sum
+
+                                            var resultSum = needSum.removeSurrounding(
+                                                " (", // prefix
+                                                ")" // suffix
+                                            )
+
+                                            var resSum = resultSum.toDouble()
 
 
-                            var needPos =
-                                ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderGuest).name
-                            var needSum =
-                                ((orderRecview.adapter as OrderAdapter).items[position] as RecyclerItem.OrderGuest).sum
+                                            ////////////////////////////
+                                            updates.put("items.${needPos}", FieldValue.delete())
+                                            updates.put("sum", FieldValue.increment(-resSum))
+                                        }
+                                        else {
+                                            break@loop
+                                        }
+                                    }
+                                    is RecyclerItem.OrderItem -> {
 
-                            var resultSum = needSum.removeSurrounding(
-                                " (", // prefix
-                                ")" // suffix
-                            )
+                                        var needName =
+                                            ((orderRecview.adapter as OrderAdapter).items[sh] as RecyclerItem.OrderItem).name.toLowerCase()
+                                        var needAmount =
+                                            ((orderRecview.adapter as OrderAdapter).items[sh] as RecyclerItem.OrderItem).amount
 
-                            var resSum = resultSum.toDouble()
+                                        var itemsNew = itemsNeed?.filter { it.name?.toLowerCase()?.contains(needName!!)!! } as MutableList<MenuItem>
+                                        var needFood = itemsNew[0]
+                                        val m = db.collection("menu5").document(needFood.id.toString())
 
-
-                            ////////////////////////////
-                            val updates = hashMapOf<String, Any>(
-                                "items.${needPos}" to FieldValue.delete(),
-                                "sum" to FieldValue.increment(-resSum)
-                            )
+                                        ////////////////////////////
+                                        updates1.put( "amount", FieldValue.increment(+ needAmount))
+                                        m.update(updates1).addOnCompleteListener {
+                                            (menuRecview.adapter as MenuAdapter).notifyDataSetChanged()
+                                        }
+                                    }
+                                }
+                            }
 
                             x.update(updates).addOnCompleteListener {
                                 (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
                             }
                         }
                     }
-
-
-                ////////////////////////////////////
-
-
-//                db.runTransaction{ transaction ->
-//                    val snapshot = transaction.get(x)
-//                    val n = (snapshot.get("items") as Map<String, Any>).size
-//                    transaction.update(x, "items.${n?.rem(position)}", mapOf<String, String>())
-//                    (orderRecview.adapter as OrderAdapter).items.removeAt(position)
-//                    (orderRecview.adapter as OrderAdapter).notifyItemRemoved(position)
-//                    (orderRecview.adapter as OrderAdapter).notifyDataSetChanged()
-//                    transaction
-//                }.addOnSuccessListener { result ->
-//                    val p = (orderRecview.adapter as OrderAdapter).items.size
-//                    Show.longToast(""+p+"err")
-//
-//
-//                }.addOnFailureListener { e ->
-//                    Log.w(TAG, "Transaction failure.", e)
-//                }
             }
         }
 
@@ -457,11 +482,22 @@ class Order : AppCompatActivity() {
                         "items.${currGeust}.${item?.id}.price",item?.price,
                         "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
 
-                    if (dcomm.text.toString() !== "") {
-                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", dcomm.text.toString() + System.getProperty("line.separator") + needItem)
-                    }
-                    else{
+                    if (dcomm.text.isNullOrEmpty()) {
                         transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", needItem)
+                    }
+                    else {
+                        if (needItem !== "") {
+                            transaction1.update(
+                                x1,
+                                "items.${currGeust}.${item?.id}.comm",
+                                "• " + dcomm.text.toString() + System.getProperty("line.separator") + "• " + needItem
+                            )
+                        } else {
+                            transaction1.update(
+                                x1,
+                                "items.${currGeust}.${item?.id}.comm",
+                                "• " + dcomm.text.toString())
+                        }
                     }
 
                     if (xsmap1?.get("items.${currGeust}.${item?.id}") == null) {
@@ -516,9 +552,9 @@ class Order : AppCompatActivity() {
         var needItem: String = ""
 
         var modifors = mutableListOf<String>()
-        modifors = item.modifor!!.values.toMutableList()
 
         if (modifors !== null) {
+            modifors = item.modifor!!.values.toMutableList()
             val recMod = d.findViewById(R.id.recMod) as RecyclerView
             val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             recMod.layoutManager = layoutManager
@@ -557,7 +593,7 @@ class Order : AppCompatActivity() {
                         "items.${currGeust}.${item?.id}.sum", item?.price!!.times(counterValue1 + settingValue))
 
                     if (comm.text.toString() !== "") {
-                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", comm.text.toString() + System.getProperty("line.separator") + needItem)
+                        transaction1.update(x1, "items.${currGeust}.${item?.id}.comm", "• " + comm.text.toString() + System.getProperty("line.separator") + "• " + needItem)
                     }
                     else{
                         transaction1.update(x1,"items.${currGeust}.${item?.id}.comm", needItem)

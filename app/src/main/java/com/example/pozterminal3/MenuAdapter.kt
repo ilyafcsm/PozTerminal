@@ -35,7 +35,7 @@ class MenuAdapter(private val clickListener: (MenuItem) -> Unit): RecyclerView.A
     override fun onBindViewHolder(holder: MenuHolder, position: Int) {
         val itm = items[position]
         holder.itemText.text = itm.name
-        holder.itemTextValues.text = " (${itm.amount?.toInt().toString()}, ${itm.price?.toInt().toString()}р)"
+        holder.itemTextValues.text = itm.amount?.toInt().toString() + "шт, " + itm.price?.toInt().toString() + "р"
         holder.itemTextValues.setOnClickListener { clickListener(itm) }
 //        holder.itemText.setOnClickListener {  val builder = AlertDialog.Builder(Order().applicationContext)
 //
