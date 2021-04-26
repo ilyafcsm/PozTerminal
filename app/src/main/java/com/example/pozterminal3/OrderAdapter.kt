@@ -17,7 +17,8 @@ data class OrderItemData(
     val addtime: com.google.firebase.Timestamp? = null,
     val price: Double? = null,
     val sum: Double? = null,
-    val comm: String? = null
+    val comm: String? = null,
+    val povar: String? = null
 )
 
 data class OrderData(
@@ -30,7 +31,7 @@ data class OrderData(
 )
 
 sealed class RecyclerItem{
-    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String): RecyclerItem()
+    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String, val povar: String): RecyclerItem()
     data class OrderGuest(var name: String, var sum: String): RecyclerItem()
 }
 
@@ -49,33 +50,6 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
     val db = Firebase.firestore
 
     var currGuest: String = "1"
-
-    //var orderRef = db.collection("test").document(orderId)
-
-//    init{
-//        orderRef.addSnapshotListener { snapshot, e ->
-//            if (e != null) {
-//                Log.w(TAG, "listen:error", e)
-//                return@addSnapshotListener
-//            }
-//
-//            if (snapshot != null && snapshot.exists()) {
-//                //items = snapshot.data?.get("items") as MutableList<String> //.data?.get("items") as MutableList<String>
-//                items = (snapshot.toObject<OrderData>()?.items?.toSortedMap()?.flatMap { (guest, itm) -> mutableListOf<RecyclerItem>(RecyclerItem.OrderGuest(guest)) + itm.map{RecyclerItem.OrderItem(it)}}) as MutableList<RecyclerItem>
-//
-//                this.notifyDataSetChanged()
-//            } else {
-//                Log.d(TAG, "Current data: null")
-//            }
-//        }
-//    }
-
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderHolder {
-//        val view = LayoutInflater.from(parent.context)
-//            .inflate(R.layout.order_holder, parent, false)
-//
-//        return OrderHolder(view)
-//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType){
         TYPE_GUEST -> GuestHolder(
@@ -97,7 +71,9 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
             )
         )
         else -> OrderHolder(
-            LayoutInflater.from(parent.context).inflate(
+            LayoutInflater.from(
+                parent.context
+                ).inflate(
                 R.layout.order_holder,
                 parent,
                 false

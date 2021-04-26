@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="ru.evotor.permission.receipt.printExtra.SET" />
 
     <application
         android:allowBackup="true"
@@ -16,14 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <service
-            android:name="com.example.pozterminal3.MyPrintableService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="evo.v2.receipt.sell.printExtra.REQUIRED" />
-            </intent-filter>
-        </service>
 
         <activity android:name="com.example.pozterminal3.Order" />
         <activity android:name="com.example.pozterminal3.MyOrders" />
@@ -31,7 +22,8 @@
             android:name="com.example.pozterminal3.DialogActivity"/>
         <activity android:name="com.example.pozterminal3.DialogActivityOrder" />
 
-        <activity android:name="com.example.pozterminal3.MainActivity">
+        <activity android:name="com.example.pozterminal3.MainActivity"
+            android:noHistory="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

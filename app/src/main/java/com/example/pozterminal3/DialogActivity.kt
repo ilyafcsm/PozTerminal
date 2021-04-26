@@ -28,7 +28,7 @@ import com.google.firebase.ktx.Firebase
 class DialogActivity : ListActivity() {
 
     private val zoneNames = arrayOf("1", "2", "3", "4", "5", "6")
-
+    private var waiter = ""
 
     //MyNewAdapter myNewAdapter1 = new MyNewAdapter(this, null);
     var recyclerView: RecyclerView? = null
@@ -37,8 +37,7 @@ class DialogActivity : ListActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
+       waiter = intent.getStringExtra("waiter").toString()
         val adapter = ArrayAdapter<String>(
             this!!.applicationContext,
             R.layout.table_dialog1,
@@ -55,26 +54,26 @@ class DialogActivity : ListActivity() {
         super.onListItemClick(l, v, position, id)
 
         val itemsel = l!!.getItemAtPosition(position).toString()
+        val intent1 =
+            Intent(this, Order::class.java)
 
         val db = Firebase.firestore
 
         var time: com.google.firebase.Timestamp? = com.google.firebase.Timestamp.now()
 
         var number: String = "0"
+        var sum = 0.0
 
         val x = db.collection("cfg").document("cfgdata")
         db.runTransaction { transaction ->
             val snapshot = transaction.get(x)
-            //val ng = (snapshot.getDouble("guests")!! + 1).toString()
             val n = snapshot.getDouble("number")!!
-            //Log.d(TAG,"${n}")
             transaction.update(x, "number", n + 1)
             n + 1
-            //transaction
-            //transaction.update(x,mapOf("items.Гость $ng" to mutableListOf<String>()))
         }.addOnSuccessListener { result ->
 
             number = result.toInt().toString()
+           // sum = result.get(x).get("sum") as Double
         }.addOnFailureListener { e ->
             Show.longToast("Fail")
         }
@@ -96,33 +95,33 @@ class DialogActivity : ListActivity() {
         var db1 = Firebase.firestore
         var colOrdersRef = db1.collection("test")
 
-            var colorSpanRed = ForegroundColorSpan(Color.RED)
-            var colorSpanGreen = ForegroundColorSpan(Color.GREEN)
-            colOrdersRef.whereEqualTo("status", "open")
-                .addSnapshotListener { snapshot, e ->
-                    if (snapshot != null) {
-                        for (i in doneNames) {
-                            for (j in snapshot) {
-                                if (j.data.get("table") == i.toString()) {
-                                    i.setSpan(
-                                        colorSpanRed,
-                                        0,
-                                        i.length,
-                                        Spanned.SPAN_EXCLUSIVE_INCLUSIVE
-                                    )
-                                    i.setSpan(
-                                        StyleSpan(Typeface.BOLD),
-                                        0,
-                                        i.length,
-                                        Spanned.SPAN_EXCLUSIVE_INCLUSIVE
-                                    )
-                                    //Show.longToast(i.toString())
-                                }
-                                // var spa = i.toSpanned()
+        var colorSpanRed = ForegroundColorSpan(Color.RED)
+        var colorSpanGreen = ForegroundColorSpan(Color.GREEN)
+        colOrdersRef.whereEqualTo("status", "open")
+            .addSnapshotListener { snapshot, e ->
+                if (snapshot != null) {
+                    for (i in doneNames) {
+                        for (j in snapshot) {
+                            if (j.data.get("table") == i.toString()) {
+                                i.setSpan(
+                                    colorSpanRed,
+                                    0,
+                                    i.length,
+                                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+                                )
+                                i.setSpan(
+                                    StyleSpan(Typeface.BOLD),
+                                    0,
+                                    i.length,
+                                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+                                )
+                                //Show.longToast(i.toString())
                             }
+                            // var spa = i.toSpanned()
                         }
                     }
                 }
+            }
 
         val adapter1 = ArrayAdapter<SpannableStringBuilder>(
             this!!.applicationContext,
@@ -132,25 +131,23 @@ class DialogActivity : ListActivity() {
             doneNames
         )
 
+
         val list1 = adapter1
-        var sum = 0.0
 
 
-        db.runTransaction { transaction ->
-            val snapshot = transaction.get(x)
-            //val ng = (snapshot.getDouble("guests")!! + 1).toString()
-            val pSum = snapshot.getDouble("sum")!!
-            //Log.d(TAG,"${n}")
+        db1.runTransaction { transaction1 ->
 
-            transaction
+            transaction1
             //transaction.update(x,mapOf("items.Гость $ng" to mutableListOf<String>()))
         }.addOnSuccessListener { result ->
 
-            sum = result.get(x).get("sum") as Double
+            //sum = result.get(x).get("sum") as Double
+            Show.longToast("Good")
         }.addOnFailureListener { e ->
+            Show.longToast("Bad")
         }
 
-        builder1.setTitle("Выберите стол")
+        val dia = builder1.setTitle("Выберите стол")
             .setAdapter(
                 list1
             ) { dialog1, item ->
@@ -161,28 +158,28 @@ class DialogActivity : ListActivity() {
                     "table" to doneNames[item].toString(),
                     "opentime" to time,
                     "items" to hashMapOf("1" to hashMapOf<String, OrderItemData>()),
-                    "sum" to sum
+                    "sum" to sum,
+                    "waiter" to waiter
                 )
                 //var StrId: String = "44444444"
 
                 val docRef = db.collection("test")
                     .document()
                 docRef.set(data)
-                    .addOnSuccessListener { }
+                    .addOnSuccessListener { Show.longToast("Ура!") }
                     .addOnFailureListener { Show.longToast("NoSuccess") }
                 var strId = docRef.id.toString()
 
-                val intent1 =
-                    Intent(this, Order::class.java)
-
                 //intent.putExtra("orderId", StrId)
                 intent1.putExtra("orderId", strId)
+
+                intent1.putExtra("waiter", waiter)
                 startActivity(intent1)
             }
             .setNegativeButton("Отмена") { dialog1, id ->
             }
 
-        builder1.create().show()
-    }
+        dia.create().show()
+            }
 
 }

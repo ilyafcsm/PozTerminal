@@ -55,5 +55,11 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.0'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     compile "com.daimajia.swipelayout:library:1.2.0@aar"
+    compile ('com.github.orangegangsters:lollipin:2.0.0@aar') {
+        transitive = true
+    }
+    implementation 'com.andrognito.pinlockview:pinlockview:2.1.0'
+    compile 'com.github.thealeksandr:PFLockScreen-Android:1.0.0-beta7'
+    compile 'com.nightonke:blurlockview:1.0.0'
 
 }

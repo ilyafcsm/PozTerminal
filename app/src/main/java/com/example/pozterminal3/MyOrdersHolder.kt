@@ -8,4 +8,7 @@ class MyOrdersHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     val myOrderText = itemView.findViewById<TextView>(R.id.my_order_text) as TextView
     val tableText = itemView.findViewById<TextView>(R.id.table_text) as TextView
     val timeText = itemView.findViewById<TextView>(R.id.time_text) as TextView
+    val status = itemView.findViewById<TextView>(R.id.textView_status) as TextView
+    val openTime = itemView.findViewById<TextView>(R.id.textViewTime) as TextView
+
 }
