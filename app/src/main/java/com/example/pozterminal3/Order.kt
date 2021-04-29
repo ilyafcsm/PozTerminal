@@ -44,9 +44,7 @@ class Order : AppCompatActivity() {
     private lateinit var menuRecview: RecyclerView
     private lateinit var searchRecview: SearchView
     private lateinit var chosentable: TextView
-    // private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
-    //private lateinit var addItemBtn: Button
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var content: ConstraintLayout
@@ -57,15 +55,11 @@ class Order : AppCompatActivity() {
         var button1 = findViewById<Button>(R.id.chosentable)
 
         var itemsNeed: MutableList<RecyclerItemGroup.MenuItem>? = null
-        var mapNeed: Map<String?, List<RecyclerItemGroup.MenuItem>>
-
-        var ops: MutableList<RecyclerItemGroup>? = null
 
 
 
 
         orderId = intent.getStringExtra("orderId") as String
-        //waiter = intent.getStringExtra("waiter") as String
         orderRef = db.collection("test").document(orderId)
         var menuRef = db.collection("menu5").orderBy("name")
 
@@ -92,7 +86,7 @@ class Order : AppCompatActivity() {
 
                     val x = orderRef //db.collection("test").document(orderId)
                     val m = db.collection("menu5")
-                        .document((it as RecyclerItemGroup.MenuItem).id.toString())
+                        .document(it.id.toString())
 
                     db.runTransaction { transaction ->
                         val msnap = transaction.get(m)
@@ -175,7 +169,6 @@ class Order : AppCompatActivity() {
                                     it.getString("group")
                                 )
                             }.filter { it.group == needGroup } as MutableList<RecyclerItemGroup>
-                            //myOrders = snapshot.documents!!.map{mapOf("orderId" to it.id, "number" to it.get("number").toString())} as MutableList<Map<String,String>> //.data?.get("items") as MutableList<String>
                             (menuRecview.adapter as MenuAdapter).notifyDataSetChanged()
                             //Log.d(TAG,"11")
                         } else {
@@ -284,11 +277,7 @@ class Order : AppCompatActivity() {
                         it.getString("descr")
                     )
                 } as MutableList<RecyclerItemGroup.MenuItem>
-
-                mapNeed = itemsNeed!!.groupBy { it.povar }
-                //myOrders = snapshot.documents!!.map{mapOf("orderId" to it.id, "number" to it.get("number").toString())} as MutableList<Map<String,String>> //.data?.get("items") as MutableList<String>
                 (menuRecview.adapter as MenuAdapter).notifyDataSetChanged()
-                //Log.d(TAG,"11")
             } else {
                 Log.d(TAG, "Current data: null")
             }
@@ -490,13 +479,20 @@ class Order : AppCompatActivity() {
         var modifors = mutableListOf<String>()
 
         if (item.modifor.isNullOrEmpty()) {
+            val recMod = d.findViewById(R.id.recMod) as RecyclerView
+            val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            recMod.layoutManager = layoutManager
+            recMod.adapter = ModAdapter(0, modifors) {
+                needItem = it
+            }
+            tspin.visibility = View.GONE
 
         } else {
             modifors = item.modifor!!.values.toMutableList()
             val recMod = d.findViewById(R.id.recMod) as RecyclerView
             val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             recMod.layoutManager = layoutManager
-            recMod.adapter = ModAdapter(modifors) {
+            recMod.adapter = ModAdapter(1, modifors) {
                 needItem = it
             }
         }
@@ -628,17 +624,19 @@ class Order : AppCompatActivity() {
             val recMod = d.findViewById(R.id.recMod) as RecyclerView
             val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             recMod.layoutManager = layoutManager
-            recMod.adapter = ModAdapter(modifors) {
+            recMod.adapter = ModAdapter(1, modifors) {
                 needItem = it
             }
         }
         else{
+
             val recMod = d.findViewById(R.id.recMod) as RecyclerView
             val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             recMod.layoutManager = layoutManager
-            recMod.adapter = ModAdapter(modifors) {
+            recMod.adapter = ModAdapter(0, modifors) {
                 needItem = it
             }
+            tspin.visibility = View.GONE
         }
 
         t2.text = needName2

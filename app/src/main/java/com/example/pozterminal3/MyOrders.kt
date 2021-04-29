@@ -46,6 +46,8 @@ class MyOrders : AppCompatActivity() {
         val intent2 = Intent(this@MyOrders, DialogActivity::class.java)
         intent2.putExtra("waiter", waiter)
         startActivity(intent2)
+
+        myOrdersRecview.adapter!!.notifyDataSetChanged()
     }
 
 
@@ -62,7 +64,6 @@ class MyOrders : AppCompatActivity() {
 
     fun deleteCollection(collection: CollectionReference, batchSize: Int) {
         try {
-            // Retrieve a small batch of documents to avoid out-of-memory errors/
             var deleted = 0
             collection
                 .limit(batchSize.toLong())
@@ -73,9 +74,9 @@ class MyOrders : AppCompatActivity() {
                         ++deleted
                     }
                     if (deleted >= batchSize) {
-                        // retrieve and delete another batch
                         deleteCollection(collection, batchSize)
                     }
+                    myOrdersRecview.adapter!!.notifyDataSetChanged()
                 }
         } catch (e: Exception) {
             System.err.println("Error deleting collection : " + e.message)

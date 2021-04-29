@@ -3,10 +3,11 @@ package com.example.pozterminal3
 import android.graphics.Color
 import android.os.Message
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class ModAdapter(val items: MutableList<String>, private val clickListener: (String) -> Unit): RecyclerView.Adapter<ModHolder>() {
+class ModAdapter(val num: Int, val items: MutableList<String>, private val clickListener: (String) -> Unit): RecyclerView.Adapter<ModHolder>() {
 
     //var items = mutableListOf<String>()
     var currMod: String = "1"
@@ -30,6 +31,15 @@ class ModAdapter(val items: MutableList<String>, private val clickListener: (Str
     override fun onBindViewHolder(holder: ModHolder, position: Int) {
         val itm = items[position]
         holder.modText.text = itm.toString()
+
+        if (holder.modText.text.isNullOrEmpty()) {
+            holder.modText.visibility = View.GONE
+            holder.itemView.layoutParams.height = holder.itemView.layoutParams.height - 450
+        }
+
+        if (num == 0) {
+            holder.itemView.layoutParams.height = holder.itemView.layoutParams.height - 90
+        }
       //  holder.itemView.set
         holder.itemView.setOnClickListener {
 

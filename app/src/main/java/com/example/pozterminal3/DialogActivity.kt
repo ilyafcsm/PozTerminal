@@ -166,8 +166,8 @@ class DialogActivity : ListActivity() {
                 val docRef = db.collection("test")
                     .document()
                 docRef.set(data)
-                    .addOnSuccessListener { Show.longToast("Ура!") }
-                    .addOnFailureListener { Show.longToast("NoSuccess") }
+                    .addOnSuccessListener {  }
+                    .addOnFailureListener {  }
                 var strId = docRef.id.toString()
 
                 //intent.putExtra("orderId", StrId)

@@ -17,12 +17,11 @@ import com.andrognito.pinlockview.PinLockView
 import com.beautycoder.pflockscreen.PFFLockScreenConfiguration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.util.*
 
 
 private lateinit var text_name: EditText
 private lateinit var text_pass: EditText
-
-const val TAG = "PinLockView"
 
 private var mPinLockView: PinLockView? = null
 private var mIndicatorDots: IndicatorDots? = null
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        getWindow().setFlags(
+        window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
@@ -44,35 +43,37 @@ class MainActivity : AppCompatActivity() {
         var pincod: String = ""
 
         mPinLockView!!.attachIndicatorDots(mIndicatorDots)
-        mPinLockView!!.setPinLength(4)
-        mPinLockView!!.setTextColor(ContextCompat.getColor(this, R.color.text_black))
+        mPinLockView!!.pinLength = 4
+        mPinLockView!!.textColor = ContextCompat.getColor(this, R.color.text_black)
 
         val mPinLockListener: PinLockListener = object : PinLockListener {
             override fun onComplete(pin: String) {
-                waitersRef.addSnapshotListener { value, error ->
-                    if (value!!.documents[1].data!!.keys.filter { it.contains(pin.toLowerCase()) }[0].toString() !== "null") {
+                waitersRef.addSnapshotListener { value, _ ->
+                    if (value!!.documents[1].data!!.keys.filter { it.contains(pin.toLowerCase(Locale.ROOT)) }.isNotEmpty() ) {
                         pincod =
-                            value!!.documents[1].data!!.keys.filter { it.contains(pin.toLowerCase()) }[0].toString()
+                            value.documents[1].data!!.keys.filter { it.contains(pin.toLowerCase(
+                                Locale.ROOT)) }[0].toString()
+
                     } else {
-                        pincod = "6666"
+                        pincod = "0000"
                     }
-                    //Show.longToast("Верно")
-                    runOnUiThread(object : Runnable {
-                        override fun run() {
-
-
-                            //Show.longToast(value!!.documents[1].data!!.get(pincod).toString())
-                            mPinLockView!!.postDelayed( Runnable { val intent = Intent(applicationContext, MyOrders::class.java)
+                    if (pincod !== "0000") {
+                        runOnUiThread {
+                            mPinLockView!!.postDelayed(Runnable {
+                                val intent = Intent(applicationContext, MyOrders::class.java)
                                 intent.putExtra(
                                     "waiter",
-                                    value!!.documents[1].data!!.get(pincod).toString()
-
+                                    value.documents[1].data!!.get(pincod).toString()
                                 )
                                 startActivity(intent)
-                                finish()}, 1000)
+                                finish()
+                            }, 1000)
                         }
                     }
-                    )
+
+                    else {
+                        Show.longToast("Неверный пароль!")
+                    }
                 }
             }
 
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mIndicatorDots!!.setIndicatorType(IndicatorDots.IndicatorType.FILL_WITH_ANIMATION)
+        mIndicatorDots!!.indicatorType = IndicatorDots.IndicatorType.FILL_WITH_ANIMATION
 
         mPinLockView!!.setPinLockListener(mPinLockListener)
 

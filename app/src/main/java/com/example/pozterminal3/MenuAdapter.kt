@@ -80,7 +80,7 @@ class MenuAdapter(private val clickListener: (RecyclerItemGroup) -> Unit): Recyc
                 (holder as MenuHolder).itemText.text = itm.name
                 (holder as MenuHolder).itemTextValues.text =
                     itm.amount?.toInt().toString() + "шт, " + itm.price?.toInt().toString() + "р"
-                (holder as MenuHolder).itemTextValues.setOnClickListener { clickListener(itm as RecyclerItemGroup.MenuItem) }
+                (holder as MenuHolder).itemTextValues.setOnClickListener { clickListener(itm) }
             }
 
             is RecyclerItemGroup.MenuGroup -> {
