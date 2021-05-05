@@ -18,7 +18,8 @@ data class OrderItemData(
     val price: Double? = null,
     val sum: Double? = null,
     val comm: String? = null,
-    val povar: String? = null
+    val povar: String? = null,
+    val status: String? = null
 )
 
 data class OrderData(
@@ -31,7 +32,7 @@ data class OrderData(
 )
 
 sealed class RecyclerItem{
-    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String, val povar: String): RecyclerItem()
+    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String, val povar: String, val status: String): RecyclerItem()
     data class OrderGuest(var name: String, var sum: String): RecyclerItem()
 }
 
@@ -102,6 +103,12 @@ class OrderAdapter(orderId:String, private val clickListener: (String) -> Unit):
                 (holder as OrderHolder).textSumOrd.setTextColor(Color.BLACK)
                 (holder as OrderHolder).textComm.setTextColor(Color.BLACK)
 
+                if (item.status == "finish") {
+                    (holder as OrderHolder).itemView.setBackgroundColor(Color.GREEN)
+                }
+                else{
+                    (holder as OrderHolder).itemView.setBackgroundColor(Color.WHITE)
+                }
                 if ((holder as OrderHolder).textComm.text.isNullOrEmpty()) {
                     (holder as OrderHolder).textComm.visibility = View.GONE
                     (holder as OrderHolder).itemView.layoutParams.height = 145

@@ -113,6 +113,8 @@ class Order : AppCompatActivity() {
                                 it.name,
                                 "items.${currGeust}.${it.id}.povar",
                                 it.povar,
+                                "items.${currGeust}.${it.id}.status",
+                                "gotovitsya",
                                 "items.${currGeust}.${it.id}.price",
                                 it.price,
                                 "items.${currGeust}.${it.id}.sum",
@@ -232,7 +234,8 @@ class Order : AppCompatActivity() {
                                     itm2.price!!,
                                     itm2.sum!!,
                                     itm2.comm!!,
-                                    itm2.povar!!
+                                    itm2.povar!!,
+                                    itm2.status!!
                                 )
                             } as MutableList<RecyclerItem>?)!!)
                         }) as MutableList<RecyclerItem>?)!! //map{RecyclerItem.OrderItem(it)}}) as MutableList<RecyclerItem>
@@ -538,6 +541,8 @@ class Order : AppCompatActivity() {
                         item?.name,
                         "items.${currGeust}.${item?.id}.povar",
                         item?.povar,
+                        "items.${currGeust}.${item?.id}.status",
+                        "gotovitsya",
                         "items.${currGeust}.${item?.id}.price",
                         item?.price,
                         "items.${currGeust}.${item?.id}.sum",
@@ -680,6 +685,8 @@ class Order : AppCompatActivity() {
                         item?.name,
                         "items.${currGeust}.${item?.id}.povar",
                         item?.povar,
+                        "items.${currGeust}.${item?.id}.status",
+                        "gotovitsya",
                         "items.${currGeust}.${item?.id}.price",
                         item?.price,
                         "items.${currGeust}.${item?.id}.sum",
