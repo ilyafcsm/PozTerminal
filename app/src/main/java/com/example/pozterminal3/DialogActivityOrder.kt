@@ -129,33 +129,11 @@ class DialogActivityOrder : ListActivity() {
         builder1.setTitle("Выберите стол")
             .setAdapter(list1
             ) { dialog1, item ->
-                //Show.longToast("Выбранный стол:  ${tableNames[item]}")
-                val data = hashMapOf(
-                    "status" to "open",
-                    "number" to number,
-                    "table" to doneNames[item].toString(),
-                    "opentime" to time,
-                    "items" to hashMapOf("1" to hashMapOf<String, OrderItemData>())
-                )
-                //var StrId: String = "44444444"
-
-                val docRef = db.collection("test")
-                    .document()
-                docRef.set(data)
-                    .addOnSuccessListener { Show.longToast("Success") }
-                    .addOnFailureListener { Show.longToast("NoSuccess") }
-                var strId = docRef.id.toString()
-
                 val intent2 = Intent()
                 val text = doneNames[item]
-//---set the data to pass back---
                 intent2.setData(Uri.parse(text.toString()));
                 setResult(RESULT_OK, intent2)
-//---close the activity---
                 finish();
-
-                //intent.putExtra("orderId", StrId)
-                //return doneNames[item]
             }
             .setNegativeButton("Отмена") {
                     dialog1, id ->

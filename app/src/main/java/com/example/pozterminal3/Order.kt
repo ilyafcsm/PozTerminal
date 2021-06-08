@@ -2,16 +2,21 @@ package com.example.pozterminal3
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.forEach
+import androidx.core.view.forEachIndexed
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +27,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_order.*
+import kotlinx.android.synthetic.main.group_holder.view.*
 import kotlinx.android.synthetic.main.menu_holder.view.*
 import kotlinx.android.synthetic.main.order_holder.view.*
 import java.text.SimpleDateFormat
@@ -48,6 +54,7 @@ class Order : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var content: ConstraintLayout
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +62,25 @@ class Order : AppCompatActivity() {
         var button1 = findViewById<Button>(R.id.chosentable)
 
         var itemsNeed: MutableList<RecyclerItemGroup.MenuItem>? = null
+
+
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setCancelable(false)
+        builder.setMessage("Нет интернета")
+
+        val dialog: AlertDialog = builder.create()
+
+        handler.post(object : Runnable {
+            override fun run() {
+                if (hasConnection(applicationContext) == false) {
+                    dialog.show()
+                }
+                else{
+                    dialog.dismiss()
+                }
+                handler.postDelayed(this, 1000)
+            }
+        })
 
 
 
@@ -128,6 +154,21 @@ class Order : AppCompatActivity() {
                                     x,
                                     "items.${currGeust}.${it.id}.addtime",
                                     com.google.firebase.Timestamp.now()
+                                )
+                            }
+
+                            if (it.group !== null) {
+                                transaction.update(
+                                    x,
+                                    "items.${currGeust}.${it.id}.group",
+                                    it.group
+                                )
+                            }
+                            else {
+                                transaction.update(
+                                    x,
+                                    "items.${currGeust}.${it.id}.group",
+                                    ""
                                 )
                             }
 
@@ -235,7 +276,8 @@ class Order : AppCompatActivity() {
                                     itm2.sum!!,
                                     itm2.comm!!,
                                     itm2.povar!!,
-                                    itm2.status!!
+                                    itm2.status!!,
+                                    itm2.group!!
                                 )
                             } as MutableList<RecyclerItem>?)!!)
                         }) as MutableList<RecyclerItem>?)!! //map{RecyclerItem.OrderItem(it)}}) as MutableList<RecyclerItem>
@@ -277,7 +319,8 @@ class Order : AppCompatActivity() {
                         it.getDouble("price"),
                         it.get("modifor") as HashMap<Any, String>?,
                         it.getString("povar"),
-                        it.getString("descr")
+                        it.getString("descr"),
+                        it.getString("group")
                     )
                 } as MutableList<RecyclerItemGroup.MenuItem>
                 (menuRecview.adapter as MenuAdapter).notifyDataSetChanged()
@@ -445,6 +488,11 @@ class Order : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        val intent = Intent(applicationContext, MyOrders::class.java)
+        startActivity(intent)
+    }
+
     fun getDateTime(s: String): String? {
         try {
             val sdf = SimpleDateFormat("HH:mm:ss")
@@ -459,8 +507,10 @@ class Order : AppCompatActivity() {
 
         val itemsNeed = (menuRecview.adapter as MenuAdapter).items
 
+
+
         var needName1 = view.itemTextView.text!!.toString()
-        var needName = needName1.toLowerCase()
+        var needName = view.itemTextView.text!!.toString().toLowerCase()
 
         val item =
             itemsNeed?.filter { (it as RecyclerItemGroup.MenuItem).name?.toLowerCase()?.contains(needName)!! }.get(0) as RecyclerItemGroup.MenuItem
@@ -545,6 +595,8 @@ class Order : AppCompatActivity() {
                         "gotovitsya",
                         "items.${currGeust}.${item?.id}.price",
                         item?.price,
+                        "items.${currGeust}.${item?.id}.group",
+                        item?.group,
                         "items.${currGeust}.${item?.id}.sum",
                         item?.price!!.times(counterValue1 + settingValue)
                     )
@@ -602,13 +654,35 @@ class Order : AppCompatActivity() {
 
     fun print1(view: View) {
 
-        val itemsNeed = (menuRecview.adapter as MenuAdapter).items
+        val namePos = (orderRecview.adapter as OrderAdapter).items.filter { when (it) { is RecyclerItem.OrderItem -> {it.name == view.itemText.text} is RecyclerItem.OrderGuest -> {1==0}}}
+
+        val namePos1 = namePos.get(0) as RecyclerItem.OrderItem
+        val nameGroup = namePos1.group
+        var itemsNeed = (menuRecview.adapter as MenuAdapter).items
+        val itemNeed = itemsNeed.filter { (it as RecyclerItemGroup.MenuGroup).group == nameGroup }.get(0) as RecyclerItemGroup.MenuGroup
+
+        //menuRecview.forEachIndexed { index, view ->  if (view.textView.text == itemNeed.group) {view.performClick()} }
+
+        menuRecview.forEach { if (it.itemTextViewGroup.text == itemNeed.group) {
+            menuRecview.postDelayed(Runnable {
+                it.itemTextViewGroup.performClick()
+                val text = "Пора покормить кота!"
+                val duration = Toast.LENGTH_SHORT
+
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+            }, 700)
+            menuRecview.adapter!!.notifyDataSetChanged()} }
+
+        menuRecview.adapter!!.notifyDataSetChanged()
+
+        itemsNeed = (menuRecview.adapter as MenuAdapter).items
 
         var needName1 = view.itemText.text!!.toString()
         val needName2 = needName1.substringBeforeLast(" (")
         var needName = needName2.toLowerCase()
 
-        val item = itemsNeed?.filter { (it as RecyclerItemGroup.MenuItem).name?.toLowerCase()?.contains(needName)!! }.get(0)
+        val item = itemsNeed?.filter { (it as RecyclerItemGroup.MenuItem).name?.toLowerCase()?.contains(needName)!! }.get(0) as RecyclerItemGroup.MenuItem
         val descr = (item as RecyclerItemGroup.MenuItem).descr
         val d = Dialog(this@Order)
         d.setContentView(R.layout.timer_dialog)
@@ -689,6 +763,8 @@ class Order : AppCompatActivity() {
                         "gotovitsya",
                         "items.${currGeust}.${item?.id}.price",
                         item?.price,
+                        "items.${currGeust}.${item?.id}.group",
+                        item?.group,
                         "items.${currGeust}.${item?.id}.sum",
                         item?.price!!.times(counterValue1 + settingValue)
                     )
@@ -839,5 +915,21 @@ class Order : AppCompatActivity() {
         builder.setCancelable(true)
 
         builder.create().show()
+    }
+
+    fun hasConnection(context: Context): Boolean {
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        var wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+        if (wifiInfo != null && wifiInfo.isConnected) {
+            return true
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+        if (wifiInfo != null && wifiInfo.isConnected) {
+            return true
+        }
+        wifiInfo = cm.activeNetworkInfo
+        return if (wifiInfo != null && wifiInfo.isConnected) {
+            true
+        } else false
     }
 }

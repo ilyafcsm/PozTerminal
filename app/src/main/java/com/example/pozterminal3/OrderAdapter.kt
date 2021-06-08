@@ -19,7 +19,8 @@ data class OrderItemData(
     val sum: Double? = null,
     val comm: String? = null,
     val povar: String? = null,
-    val status: String? = null
+    val status: String? = null,
+    val group: String? = null
 )
 
 data class OrderData(
@@ -32,7 +33,7 @@ data class OrderData(
 )
 
 sealed class RecyclerItem{
-    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String, val povar: String, val status: String): RecyclerItem()
+    data class OrderItem(val name:String, val kod:String, val amount:Double, val price: Double, val sum: Double, val comm: String, val povar: String, val status: String, val group: String): RecyclerItem()
     data class OrderGuest(var name: String, var sum: String): RecyclerItem()
 }
 
